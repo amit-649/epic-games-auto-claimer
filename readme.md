@@ -12,17 +12,19 @@ If you're like me and love free stuff but hate the manual work, this is for you.
 
 😎 Set & Forget: Run it once a week (or schedule it!), and it handles the rest.
 
+🔐 God Mode (Auto-Login): It can log itself in automatically using 2FA if your session expires. No more manual logins!
+
 🧠 Smart Brain: It remembers what you already own, so it won't waste time trying to claim the same game twice.
 
 👻 Ghost Mode: It runs silently in the background (Headless Mode)—you won't even see a browser window open.
 
 🔔 Ding!: Hook it up to your Discord, and get a satisfying notification every time it grabs a new game.
 
-🛡️ Safe: All your login info stays on your computer. Nothing is sent to me or anyone else.
+📜 Detailed Logs: Keeps a neat bot.log file so you can see exactly what happened while you were asleep.
 
 🚀 Let's Get Started!
 
-Setting this up takes about 5-10 minutes. Grab a coffee ☕ and let's go.
+Setting this up takes about 10 minutes. Grab a coffee ☕ and let's go.
 
 Step 1: Download & Install
 
@@ -30,7 +32,7 @@ First things first, let's get the code on your machine.
 
 Download this project (Click the green Code button -> Download ZIP and unzip it).
 
-Install Python if you don't have it. (Download Here).
+Install Python if you don't have it.
 
 Important: When installing, check the box that says "Add Python to PATH". Seriously, don't skip this!
 
@@ -38,14 +40,14 @@ Open the folder in your terminal (Right-click inside the folder -> "Open in Term
 
 Run this command to install the required magic spells (libraries):
 
-```bash 
+```bash
 pip install -r requirements.txt
 playwright install chromium
 ```
 
 Step 2: Give the Bot a Memory (Google Sheets)
 
-We need a place for the bot to write down which games it has claimed. We'll use Google Sheets for this.
+We use Google Sheets to keep a log of everything we've claimed.
 
 Head over to the Google Cloud Console.
 
@@ -88,24 +90,21 @@ HEADLESS_MODE=true
 # How many games/tabs to process at once? 4 is usually a safe bet.
 MAX_CONCURRENT_GAMES=4
 
+# --- 🔐 GOD MODE (Auto-Login) ---
+# If you want the bot to login automatically when cookies expire:
+EPIC_EMAIL=your_email@example.com
+EPIC_PASSWORD=your_password
+# Get this from Epic Account -> Password & Security -> 2FA -> Authenticator App -> "Manual Entry"
+EPIC_TOTP_SECRET=YOUR_2FA_SECRET_KEY_HERE
 
-Step 4: The One-Time Login
 
-We need to log you in once so the bot can save your session cookies. Don't worry, this stays local on your PC.
+Step 4: The One-Time Login (Or Just Run It!)
 
-Run this command:
+You have two choices:
 
-```bash
-python auth.py
-```
+Manual Login: Run python auth.py to log in once manually.
 
-A real browser window will pop up.
-
-Log in to your Epic Games account manually.
-
-Once you're logged in and see the store homepage, go back to your terminal and press Enter.
-
-Done! Your session is saved in the epic_browser_data folder.
+God Mode: If you filled in the EPIC_TOTP_SECRET in your .env file, the bot can log in by itself! You can just skip to Step 5.
 
 Step 5: Launch It! 🚀
 
@@ -121,11 +120,13 @@ If you see green text and "Success!" messages, you're all set. Sit back and enjo
 
 bot.py: The main brain. This runs the show.
 
-auth.py: A helper tool for that one-time login.
+auth.py: A helper tool for manual login.
 
 .env: Your settings file (Keep this safe!).
 
 credentials.json: Your key to Google Sheets.
+
+bot.log: A text file where the bot writes down everything it does (errors, successes, etc.).
 
 epic_browser_data/: Where your login cookies live.
 
