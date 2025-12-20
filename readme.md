@@ -1,114 +1,121 @@
-🎮 Epic Games Auto-Claimer Bot
+🎮 Epic Games Auto-Claimer
 
-An intelligent, fully automated tool that claims free weekly games from the Epic Games Store for you. It runs in the background, checks for new free games, and claims them if you don't already own them.
+Hey there! 👋 This is a simple, set-it-and-forget-it tool that grabs the weekly free games from the Epic Games Store for you.
 
-✨ What does it do?
+I built this because I kept forgetting to check the store every Thursday. Now, this script runs in the background, checks what's free, and claims it if you don't have it yet.
 
-Claims Free Games: Automatically finds and claims the weekly free games on Epic.
+✨ Why use this?
 
-Skips Owned Games: Checks your Google Sheet history so it doesn't waste time on games you have.
+Never Miss a Freebie: It automatically finds the weekly free games and adds them to your library.
 
-Runs Silently: Can run in "Headless Mode" (invisible) so it doesn't disturb you.
+Smart Skipping: It remembers what you already own (using a Google Sheet) so it doesn't waste time trying to claim the same game twice.
 
-Notifies You: Sends a message to your Discord server when a game is claimed.
+Stealth Mode: It runs silently in the background (Headless Mode), so you won't even see a browser window pop up.
 
-Smart & Safe: Handles "Age Verification" gates and avoids claiming paid DLCs by mistake.
+Get Notified: Hook it up to Discord, and it'll ping you whenever it grabs a new game. "Success! Just claimed [Game Name]!"
 
-🚀 How to Set Up (Step-by-Step)
+Safe & Secure: It handles age verification gates and skips paid DLCs automatically. Plus, all your login data stays on your own computer.
 
-Step 1: Download and Install
+🚀 Let's Get It Running
 
-Download this code (Click "Code" -> "Download ZIP" and extract it).
+Step 1: Grab the Code
 
-Install Python if you haven't already (Download Python Here). Make sure to check "Add Python to PATH" during installation!
+Download this project (Click Code -> Download ZIP and unzip it).
+
+Install Python if you don't have it yet (Download Here).
+
+Important: Check the box that says "Add Python to PATH" when installing!
 
 Open the folder in your terminal (Right-click folder -> "Open in Terminal").
 
-Run this command to install the required tools:
+Install the necessary libraries by running this command:
 
-
-```bash 
+``` bash
 pip install -r requirements.txt
 playwright install chromium
 ```
 
+Step 2: Give it a Brain (Google Sheets)
 
-Step 2: Google Sheets Setup (The "Memory" of the Bot)
+We use Google Sheets to keep a log of everything we've claimed.
 
 Go to the Google Cloud Console.
 
-Create a new project.
+Create a new project (name it whatever you want).
 
 Search for "Google Sheets API" and "Google Drive API" and enable both.
 
 Go to Credentials -> Create Credentials -> Service Account.
 
-Click on the email address created, go to Keys -> Add Key -> Create New Key (JSON).
+Click on the email address it creates, go to Keys -> Add Key -> Create New Key (JSON).
 
-A file will download. Rename it to credentials.json and put it in your project folder.
+A file will download. Rename it to credentials.json and drop it into your project folder.
 
-Open the JSON file, copy the client_email address.
+Open that JSON file, find the client_email address, and copy it.
 
-Create a new Google Sheet (name it "EpicGamesLog"), and Share it with that email address (give "Editor" permission).
+Create a new Google Sheet (I call mine "EpicGamesLog") and Share it with that email address (make sure to give it "Editor" access).
 
-Step 3: Configuration (The .env File)
+Step 3: Configure Your Settings
 
-In the project folder, create a new text file and name it .env (just .env, no .txt at the end).
+In the project folder, create a new file named .env.
 
-Open it with Notepad and paste this inside:
+Open it with Notepad and paste the settings below. Fill in your details!
 
-# --- YOUR SECRETS ---
-# 1. (Optional) Create a Webhook in your Discord Server Settings -> Integrations -> Webhooks
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE
+# --- NOTIFICATIONS (Optional) ---
+# Create a Webhook in your Discord Server Settings -> Integrations -> Webhooks
+DISCORD_WEBHOOK_URL=[https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE](https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE)
 
-# 2. The name of the Google Sheet you created
+# --- GOOGLE SHEETS SETUP ---
 GOOGLE_SHEET_NAME=EpicGamesLog
-
-# 3. The name of your key file (should be credentials.json)
 GOOGLE_CREDENTIALS_FILE=credentials.json
 
-# --- SETTINGS ---
-# Set to 'true' to run invisibly, 'false' to watch it work
+# --- BOT SETTINGS ---
+# Set to 'true' to run invisibly, 'false' to watch the browser work
 HEADLESS_MODE=true
 
-# How many games to claim at the same time (4 is good for most PCs)
+# How many tabs to open at once? 4 is a sweet spot.
 MAX_CONCURRENT_GAMES=4
 
 
-Step 4: Log In Once
+Step 4: One-Time Login
 
-Run this command to log in to your Epic Games account. This saves your session so you don't have to log in every time.
+You need to log in to Epic Games once so the bot saves your session.
 
-```bash 
+Run this command:
+
+
+```bash
 python auth.py
 ```
 
+A browser window will open. Log in to your Epic account manually.
 
-Follow the instructions on screen. Once you are logged in and see the store page, press Enter in the terminal.
+Once you see the store homepage, head back to your terminal and press Enter.
 
-Step 5: Run the Bot!
+That's it! Your session is saved safely in the epic_browser_data folder.
 
-To claim games, simply run:
+Step 5: Launch the Bot 🚀
+
+Time to let it do its thing!
 
 ```bash 
 python bot.py
 ```
 
+If everything is set up right, you'll see it scanning for games and logging them to your sheet.
 
-📂 Files in this Project
+📂 Project Structure
 
-bot.py: The main brain. Runs the automation.
+bot.py: The main script. This is where the magic happens.
 
-auth.py: A helper tool to log you in one time.
+auth.py: A simple helper to log you in.
 
-.env.example: A template for your settings.
+.env: Your settings file (Keep this safe!).
 
-.env: (You create this) Stores your real settings safely.
+credentials.json: Your key to Google Sheets.
 
-credentials.json: (You create this) Your key to Google Sheets.
+epic_browser_data/: Where your login cookies live.
 
-epic_browser_data/: (Created automatically) Stores your login session.
+⚠️ A Quick Note
 
-⚠️ Disclaimer
-
-This tool is for educational purposes. Please use responsibly.
+This tool is a fun project for educational purposes. Please use it responsibly and respect Epic Games' Terms of Service. Happy gaming! 🎮
