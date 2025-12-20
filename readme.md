@@ -26,8 +26,9 @@ Open the folder in your terminal (Right-click folder -> "Open in Terminal").
 
 Run this command to install the required tools:
 
-pip install -r requirements.txt
-playwright install chromium
+
+```pip install -r requirements.txt```
+```playwright install chromium```
 
 
 Step 2: Google Sheets Setup (The "Memory" of the Bot)
@@ -56,7 +57,7 @@ Open it with Notepad and paste this inside:
 
 # --- YOUR SECRETS ---
 # 1. (Optional) Create a Webhook in your Discord Server Settings -> Integrations -> Webhooks
-DISCORD_WEBHOOK_URL=[https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE](https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE)
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE
 
 # 2. The name of the Google Sheet you created
 GOOGLE_SHEET_NAME=EpicGamesLog
@@ -76,7 +77,7 @@ Step 4: Log In Once
 
 Run this command to log in to your Epic Games account. This saves your session so you don't have to log in every time.
 
-python auth.py
+```python auth.py```
 
 
 Follow the instructions on screen. Once you are logged in and see the store page, press Enter in the terminal.
@@ -85,7 +86,7 @@ Step 5: Run the Bot!
 
 To claim games, simply run:
 
-python bot.py
+```python bot.py```
 
 
 📂 Files in this Project
@@ -94,7 +95,9 @@ bot.py: The main brain. Runs the automation.
 
 auth.py: A helper tool to log you in one time.
 
-.env: (You create this) Stores your settings safely.
+.env.example: A template for your settings.
+
+.env: (You create this) Stores your real settings safely.
 
 credentials.json: (You create this) Your key to Google Sheets.
 
