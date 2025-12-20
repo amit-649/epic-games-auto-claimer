@@ -32,12 +32,11 @@ gsheet_client = None
 gsheet_sheet = None
 claimed_cache = set()
 
-# ... (The rest of your script remains exactly the same) ...
 def init_sheets():
+    # We keep 'global' here because we are ASSIGNING new values to these variables
     global gsheet_client, gsheet_sheet, claimed_cache
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        # Now using the variable from ENV
         creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
         gsheet_client = gspread.authorize(creds)
         gsheet_sheet = gsheet_client.open(SHEET_NAME).sheet1
@@ -63,7 +62,8 @@ async def send_discord_notification(context, message):
         print(f"⚠️ Failed to send Discord notification: {e}")
 
 def log_to_sheet_sync(game_name: str, url: str, status: str):
-    global gsheet_sheet, claimed_cache
+    # REMOVED 'global' keyword here to fix F824 error.
+    # We are reading/modifying the objects, not reassigning the variable names.
     if gsheet_sheet:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
