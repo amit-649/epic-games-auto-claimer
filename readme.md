@@ -27,8 +27,10 @@ Open the folder in your terminal (Right-click folder -> "Open in Terminal").
 Run this command to install the required tools:
 
 
-```pip install -r requirements.txt```
-```playwright install chromium```
+```bash 
+pip install -r requirements.txt
+playwright install chromium
+```
 
 
 Step 2: Google Sheets Setup (The "Memory" of the Bot)
@@ -77,7 +79,9 @@ Step 4: Log In Once
 
 Run this command to log in to your Epic Games account. This saves your session so you don't have to log in every time.
 
-```python auth.py```
+```bash 
+python auth.py
+```
 
 
 Follow the instructions on screen. Once you are logged in and see the store page, press Enter in the terminal.
@@ -86,7 +90,9 @@ Step 5: Run the Bot!
 
 To claim games, simply run:
 
-```python bot.py```
+```bash 
+python bot.py
+```
 
 
 📂 Files in this Project
