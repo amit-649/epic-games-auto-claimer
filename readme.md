@@ -1,0 +1,1 @@
+"This project uses Environment Variables for configuration, ensuring that sensitive data (API keys, Webhooks) is never hardcoded. It is fully configurable via a .env file."

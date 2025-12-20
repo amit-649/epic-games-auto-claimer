@@ -1,0 +1,22 @@
+Ignore Python cache
+
+pycache/
+*.pyc
+
+Ignore Environment Variables (SECRETS)
+
+.env
+
+Ignore Google Credentials (SECRETS)
+
+credentials.json
+*.json
+
+Ignore Browser Data (User Login Session)
+
+epic_browser_data/
+epic_session.json
+
+Ignore Screenshots
+
+*.png
