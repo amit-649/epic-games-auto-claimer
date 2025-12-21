@@ -1,137 +1,196 @@
-🎮 Epic Games Auto-Claimer
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square)
+![Automation](https://img.shields.io/badge/Automation-Playwright-green?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)
+![Beginner Friendly](https://img.shields.io/badge/Beginner-Friendly-brightgreen?style=flat-square)
+![Made With Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red?style=flat-square)
+---
 
-Never miss a free game again! 🚀
+# 🎮 Epic Games Auto-Claimer
 
-Hey! 👋 Welcome to my Epic Games Auto-Claimer. I built this tool because, honestly, I kept forgetting to check the Epic Store every Thursday for the free games. And when I did remember, it was usually too late! 😅
+**Never miss a free Epic Games title again. Automatically. Reliably. Quietly.**
 
-So, I wrote this script to do the boring work for me. It runs in the background, checks what's free this week, and claims it automatically. It even tracks everything in a Google Sheet so I know what I've got.
+Every Thursday, Epic Games gives away free games.
+And every Thursday, many of us forget to claim them.
 
-If you're like me and love free stuff but hate the manual work, this is for you. Enjoy! 🎁
+This project exists to solve that problem—permanently.
 
-✨ Why You'll Love This
+Epic Games Auto-Claimer is a Python automation tool that runs in the background, checks the Epic Games Store for free titles, and claims them for you automatically. No reminders. No manual effort. No missed games.
 
-😎 Set & Forget: Run it once a week (or schedule it!), and it handles the rest.
+It also keeps a clean, permanent record of everything you’ve claimed using Google Sheets—so you always know what’s yours.
 
-🔐 God Mode (Auto-Login): It can log itself in automatically using 2FA if your session expires. No more manual logins!
+This tool was built out of a simple frustration, but designed with care, reliability, and respect for automation best practices.
 
-🧠 Smart Brain: It remembers what you already own, so it won't waste time trying to claim the same game twice.
+---
 
-👻 Ghost Mode: It runs silently in the background (Headless Mode)—you won't even see a browser window open.
+## ✨ Key Features
 
-🔔 Ding!: Hook it up to your Discord, and get a satisfying notification every time it grabs a new game.
+**Set & Forget Automation**
+Run it weekly (or schedule it with cron/Task Scheduler). Once configured, it handles everything on its own.
 
-📜 Detailed Logs: Keeps a neat bot.log file so you can see exactly what happened while you were asleep.
+**Automatic Login with 2FA Support**
+If your session expires, the bot can securely log in again using Epic Games credentials and TOTP-based 2FA.
 
-🚀 Let's Get Started!
+**Smart Claim Logic**
+Already own a game? The bot detects it and skips unnecessary actions.
 
-Setting this up takes about 10 minutes. Grab a coffee ☕ and let's go.
+**Headless Background Execution**
+Runs silently in headless mode. No browser windows, no interruptions.
 
-Step 1: Download & Install
+**Discord Notifications (Optional)**
+Receive instant notifications when a new game is successfully claimed.
 
-First things first, let's get the code on your machine.
+**Google Sheets Logging**
+Every claimed game is recorded in a Google Sheet for long-term tracking.
 
-Download this project (Click the green Code button -> Download ZIP and unzip it).
+**Detailed Logging**
+All actions, successes, and errors are written to `bot.log` for transparency and debugging.
 
-Install Python if you don't have it.
+---
 
-Important: When installing, check the box that says "Add Python to PATH". Seriously, don't skip this!
+## 🚀 Getting Started
 
-Open the folder in your terminal (Right-click inside the folder -> "Open in Terminal").
+Setup takes approximately **10 minutes**.
 
-Run this command to install the required magic spells (libraries):
+### Prerequisites
+
+* Python **3.9+**
+* Google account (for Sheets logging)
+* Epic Games account
+* (Optional) Discord server for notifications
+
+---
+
+## 🛠 Step 1: Installation
+
+1. Download the repository
+
+   * Click **Code → Download ZIP**
+   * Extract it to a folder
+
+2. Install Python
+
+   * Download from the official site
+   * **Important:** Enable **“Add Python to PATH”** during installation
+
+3. Open a terminal in the project folder
+
+4. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 playwright install chromium
 ```
 
-Step 2: Give the Bot a Memory (Google Sheets)
+---
 
-We use Google Sheets to keep a log of everything we've claimed.
+## 📊 Step 2: Google Sheets Setup (Bot Memory)
 
-Head over to the Google Cloud Console.
+The bot uses Google Sheets to log claimed games.
 
-Create a New Project (name it "EpicGamesBot" or whatever you like).
+1. Open **Google Cloud Console**
+2. Create a new project (any name)
+3. Enable:
 
-Search for "Google Sheets API" and "Google Drive API" and Enable both of them.
+   * Google Sheets API
+   * Google Drive API
+4. Go to **Credentials → Create Credentials → Service Account**
+5. Create a **JSON key**
+6. Rename the downloaded file to `credentials.json`
+7. Place it in the project root
+8. Copy the `client_email` from the JSON file
+9. Create a Google Sheet (e.g. `EpicGamesLog`)
+10. Share the sheet with that email and grant **Editor access**
 
-Go to Credentials -> Create Credentials -> Service Account.
+---
 
-Click on the email address it creates for you. Go to Keys -> Add Key -> Create New Key (JSON).
+## ⚙️ Step 3: Configuration
 
-A file will download. Rename it to credentials.json and drop it into your project folder.
+Create a `.env` file in the project directory and configure it as follows:
 
-Open that JSON file, find the client_email line, and copy the email address.
+```env
+# --- 🔔 DISCORD NOTIFICATIONS (Optional) ---
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE
 
-Create a new Google Sheet (I named mine "EpicGamesLog") and Share it with that email address you just copied. (Make sure to give it Editor access!).
-
-Step 3: Configure Your Settings
-
-Now, let's tell the bot how you want it to behave.
-
-In your project folder, create a new file named .env.
-
-Open it with Notepad (or VS Code) and paste in these settings.
-
-Fill in your details!
-
-# --- 🔔 NOTIFICATIONS (Optional) ---
-# Want a ping on Discord? Create a Webhook in Server Settings -> Integrations -> Webhooks
-DISCORD_WEBHOOK_URL=[https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE](https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE)
-
-# --- 📊 GOOGLE SHEETS SETUP ---
+# --- 📊 GOOGLE SHEETS ---
 GOOGLE_SHEET_NAME=EpicGamesLog
 GOOGLE_CREDENTIALS_FILE=credentials.json
 
 # --- 🤖 BOT SETTINGS ---
-# Set to 'true' to run invisibly, 'false' if you want to watch the browser work (it's oddly satisfying)
 HEADLESS_MODE=true
-
-# How many games/tabs to process at once? 4 is usually a safe bet.
 MAX_CONCURRENT_GAMES=4
 
-# --- 🔐 GOD MODE (Auto-Login) ---
-# If you want the bot to login automatically when cookies expire:
+# --- 🔐 AUTO LOGIN (Optional but Recommended) ---
 EPIC_EMAIL=your_email@example.com
 EPIC_PASSWORD=your_password
-# Get this from Epic Account -> Password & Security -> 2FA -> Authenticator App -> "Manual Entry"
-EPIC_TOTP_SECRET=YOUR_2FA_SECRET_KEY_HERE
+EPIC_TOTP_SECRET=YOUR_2FA_SECRET_KEY
+```
 
+**Security note:**
+Never commit `.env` or `credentials.json` to a public repository.
 
-Step 4: The One-Time Login (Or Just Run It!)
+---
 
-You have two choices:
+## 🔑 Step 4: Authentication
 
-Manual Login: Run python auth.py to log in once manually.
+You have two options:
 
-God Mode: If you filled in the EPIC_TOTP_SECRET in your .env file, the bot can log in by itself! You can just skip to Step 5.
+### Option A: Manual Login (One-Time)
 
-Step 5: Launch It! 🚀
+```bash
+python auth.py
+```
 
-The moment of truth. Run the bot and watch it go!
+Log in manually once. Cookies will be saved locally.
+
+### Option B: Fully Automated Login (Recommended)
+
+If `EPIC_TOTP_SECRET` is configured, the bot handles login automatically.
+No manual step required.
+
+---
+
+## ▶️ Step 5: Run the Bot
 
 ```bash
 python bot.py
 ```
 
-If you see green text and "Success!" messages, you're all set. Sit back and enjoy your free games. 🎉
+If everything is configured correctly, you’ll see success logs and claimed games being recorded.
 
-📂 What's inside?
+From this point onward, the bot can be scheduled and forgotten.
 
-bot.py: The main brain. This runs the show.
+---
 
-auth.py: A helper tool for manual login.
+## 📁 Project Structure
 
-.env: Your settings file (Keep this safe!).
+```
+bot.py                # Main automation logic
+auth.py               # Manual login helper
+.env                  # Environment configuration
+credentials.json      # Google API credentials
+bot.log               # Execution logs
+epic_browser_data/    # Stored browser session data
+```
 
-credentials.json: Your key to Google Sheets.
+---
 
-bot.log: A text file where the bot writes down everything it does (errors, successes, etc.).
+## ⚠️ Disclaimer
 
-epic_browser_data/: Where your login cookies live.
+This project is intended for **educational and personal automation use only**.
+It mimics normal human interaction patterns and does not exploit Epic Games services.
 
-⚠️ Just a Heads Up
+Use responsibly.
+You are accountable for how you run it.
 
-This tool is a fun hobby project for educational purposes. Use it responsibly! I'm not responsible if Epic Games gets mad (though this script tries to be very polite and human-like).
+---
 
-Happy Gaming! 🎮
+## 🎮 Final Note
+
+This tool exists so you don’t have to think about free games ever again.
+
+Run it.
+Schedule it.
+Forget about it.
+Enjoy your growing library.
+
+Happy gaming.
