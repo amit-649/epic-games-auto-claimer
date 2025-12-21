@@ -1,0 +1,31 @@
+# --- 🔔 DISCORD NOTIFICATIONS (Optional) ---
+# Paste your Discord Webhook URL here to get notifications.
+# Create one in Server Settings -> Integrations -> Webhooks
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE
+
+# --- 📊 GOOGLE SHEETS ---
+# The name of the Google Sheet where claimed games will be logged
+GOOGLE_SHEET_NAME=EpicGamesLog
+
+# The filename of your Google Cloud Service Account JSON key
+GOOGLE_CREDENTIALS_FILE=credentials.json
+
+# --- 🤖 BOT SETTINGS ---
+# Set to 'true' to run the browser in the background (invisible)
+# Set to 'false' to watch the browser work
+HEADLESS_MODE=true
+
+# How many tabs to open at once for claiming games
+# 4 is a safe default for most computers
+MAX_CONCURRENT_GAMES=4
+
+# Path to store browser cookies and cache
+BROWSER_DATA_DIR=./epic_browser_data
+
+# --- 🔐 AUTO LOGIN (Optional but Recommended) ---
+# Fill these in if you want the bot to automatically log in when your session expires.
+# This requires enabling "Third-Party Authenticator App" in your Epic account settings.
+EPIC_EMAIL=your_email@example.com
+EPIC_PASSWORD=your_password
+# Get this Secret Key from Epic Account -> Password & Security -> 2FA -> Authenticator App -> "Manual Entry"
+EPIC_TOTP_SECRET=YOUR_2FA_SECRET_KEY_HERE
