@@ -16,8 +16,6 @@ load_dotenv()
 
 # --- CONFIGURATION ---
 USER_DATA_DIR = os.getenv("BROWSER_DATA_DIR", "./epic_browser_data")
-USER_DATA_DIR = os.path.abspath(USER_DATA_DIR)
-
 CREDENTIALS_FILE = os.getenv("GOOGLE_CREDENTIALS_FILE", "credentials.json")
 SHEET_NAME = os.getenv("GOOGLE_SHEET_NAME", "EpicGamesLog")
 
@@ -152,7 +150,7 @@ async def attempt_auto_login(page):
         await pass_input.wait_for(state="visible", timeout=10000)
         await pass_input.fill(EPIC_PASSWORD)
         await pass_input.press("Enter")
-        await asyncio.sleep(8) # Wait for processing
+        await asyncio.sleep(5) 
 
         # --- FIX: Use locator() not frame_locator() for counting ---
         if await page.locator("iframe[title*='arkose']").count() > 0 or await page.locator("iframe[src*='arkose']").count() > 0:
@@ -160,27 +158,23 @@ async def attempt_auto_login(page):
             await page.screenshot(path="login_failed_captcha.png")
             return False
 
-        # --- 2FA DETECTION (Broad Search) ---
+        # --- 2FA DETECTION (More General) ---
         logger.info("Scanning for ANY visible 2FA input...")
         otp_input = None
         
-        # Poll for 20 seconds
         start_time = datetime.now()
         while (datetime.now() - start_time).seconds < 20:
-            # Check all inputs on page
             inputs = page.locator("input:visible")
             count = await inputs.count()
             
             for i in range(count):
                 inp = inputs.nth(i)
-                # Skip email/password fields if they are still visible
                 name = await inp.get_attribute("name") or ""
                 type_attr = await inp.get_attribute("type") or ""
                 
                 if "email" in name or "password" in name or type_attr == "password":
                     continue
                 
-                # If we found a visible text/tel/number input that ISN'T email/pass, it's likely the OTP
                 otp_input = inp
                 logger.info(f"Found potential OTP input: name='{name}', type='{type_attr}'")
                 break
@@ -257,7 +251,6 @@ async def process_single_game(context, game_url: str, game_title: str, semaphore
                     logger.error(f"❌ Failed to login on tab {game_title}. Closing.")
                     await page.close()
                     return
-                # --- FIX: FORCE RELOAD TO APPLY SESSION ---
                 logger.info("Refreshing page to apply session...")
                 await page.goto(game_url, wait_until="domcontentloaded")
                 await asyncio.sleep(5) 
@@ -287,7 +280,6 @@ async def process_single_game(context, game_url: str, game_title: str, semaphore
                          logger.warning(f"⚠️ Clicked Get -> Redirected to Login. Attempting login...")
                          success = await attempt_auto_login(page)
                          if not success: return
-                         # --- FIX: RELOAD AND RE-CLICK ---
                          logger.info("Reloading and re-clicking Get...")
                          await page.goto(game_url, wait_until="domcontentloaded")
                          await asyncio.sleep(5)
@@ -352,14 +344,27 @@ async def main_job():
     async with async_playwright() as p:
         try:
             logger.info(f"🌍 Launching Browser (Headless: {HEADLESS_MODE})...")
-            launch_args = ["--disable-blink-features=AutomationControlled"]
-            if HEADLESS_MODE: launch_args.append("--headless=new")
+            
+            # --- STEALTH ARGS FOR HEADLESS MODE ---
+            launch_args = [
+                "--disable-blink-features=AutomationControlled",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-infobars",
+                "--window-position=0,0",
+                "--ignore-certificate-errors",
+                "--ignore-certificate-errors-spki-list",
+                "--disable-dev-shm-usage"
+            ]
+            if HEADLESS_MODE:
+                launch_args.append("--headless=new")
             
             context = await p.chromium.launch_persistent_context(
                 user_data_dir=USER_DATA_DIR,
                 channel="chrome",
                 headless=HEADLESS_MODE, 
                 args=launch_args,
+                # Use a real User-Agent to look less suspicious
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
                 viewport={"width": 1920, "height": 1080}
             )
