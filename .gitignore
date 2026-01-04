@@ -1,6 +1,26 @@
+# --- Secrets (CRITICAL) ---
 .env
 credentials.json
+epic_session.json
+service_account.json
+
+# --- Browser Data ---
 epic_browser_data/
-__pycache__/
+user_data/
+
+# --- Bot Logs & Data ---
 *.log
 *.png
+history.csv
+claimed_games_lite.csv
+
+# --- Build Folders ---
+dist/
+build/
+*.spec
+
+# --- Python Junk ---
+__pycache__/
+*.pyc
+venv/
+.venv/

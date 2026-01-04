@@ -4,6 +4,7 @@ import re
 import os
 import logging
 import pyotp
+import csv  # Added for Lite Mode
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from oauth2client.service_account import ServiceAccountCredentials
@@ -18,6 +19,7 @@ load_dotenv()
 USER_DATA_DIR = os.getenv("BROWSER_DATA_DIR", "./epic_browser_data")
 CREDENTIALS_FILE = os.getenv("GOOGLE_CREDENTIALS_FILE", "credentials.json")
 SHEET_NAME = os.getenv("GOOGLE_SHEET_NAME", "EpicGamesLog")
+CSV_FILE = "claimed_games_lite.csv" # Local fallback file
 
 try:
     MAX_CONCURRENT_GAMES = int(os.getenv("MAX_CONCURRENT_GAMES", "4"))
@@ -27,10 +29,16 @@ except ValueError:
 HEADLESS_MODE = os.getenv("HEADLESS_MODE", "True").lower() == "true"
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
-# --- GOD MODE CREDENTIALS ---
-EPIC_EMAIL = os.getenv("EPIC_EMAIL")
-EPIC_PASSWORD = os.getenv("EPIC_PASSWORD")
-EPIC_TOTP_SECRET = os.getenv("EPIC_TOTP_SECRET")
+# --- GLOBAL VARIABLES ---
+gsheet_client = None
+gsheet_sheet = None
+claimed_cache = set()
+LITE_MODE = False # Flag to track if we are using CSV or Google Sheets
+
+# Variables for Credentials (will be loaded dynamically now)
+EPIC_EMAIL = ""
+EPIC_PASSWORD = ""
+EPIC_TOTP_SECRET = ""
 
 # --- LOGGING SETUP ---
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -39,23 +47,35 @@ log_handler.setFormatter(log_formatter)
 
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setFormatter(log_formatter)
-if sys.stdout.encoding.lower() != 'utf-8':
-    try: sys.stdout.reconfigure(encoding='utf-8')
-    except: pass
 
+# Configure Root Logger so GUI can attach later
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 if logger.hasHandlers(): logger.handlers.clear()
 logger.addHandler(log_handler)
 logger.addHandler(console_handler)
 
-# --- GLOBAL VARIABLES ---
-gsheet_client = None
-gsheet_sheet = None
-claimed_cache = set()
+def reload_config():
+    """Refreshes variables from .env (Called by GUI)"""
+    global EPIC_EMAIL, EPIC_PASSWORD, EPIC_TOTP_SECRET, HEADLESS_MODE, DISCORD_WEBHOOK_URL
+    load_dotenv(override=True)
+    EPIC_EMAIL = os.getenv("EPIC_EMAIL")
+    EPIC_PASSWORD = os.getenv("EPIC_PASSWORD")
+    EPIC_TOTP_SECRET = os.getenv("EPIC_TOTP_SECRET")
+    HEADLESS_MODE = os.getenv("HEADLESS_MODE", "True").lower() == "true"
+    DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
 
 def init_sheets():
-    global gsheet_client, gsheet_sheet, claimed_cache
+    global gsheet_client, gsheet_sheet, claimed_cache, LITE_MODE
+    
+    # 1. Check if Credentials File Exists
+    if not os.path.exists(CREDENTIALS_FILE):
+        logger.warning("⚠️ Google Credentials not found. Switching to LITE MODE (CSV Storage).")
+        LITE_MODE = True
+        init_csv()
+        return
+
+    # 2. Try Connecting to Google
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
@@ -69,9 +89,32 @@ def init_sheets():
             logger.info(f"📚 Loaded {len(claimed_cache)} existing games from sheet.")
         except Exception as e:
             logger.warning(f"⚠️ Could not load cache: {e}")
+            
     except Exception as e:
-        logger.error(f"❌ Failed to initialize Google Sheets: {e}")
-        gsheet_sheet = None
+        logger.error(f"❌ Failed to connect to Google Sheets: {e}")
+        logger.warning("⚠️ Falling back to LITE MODE (CSV Storage).")
+        LITE_MODE = True
+        init_csv()
+
+def init_csv():
+    """Initialize local CSV storage"""
+    global claimed_cache
+    try:
+        if not os.path.exists(CSV_FILE):
+            with open(CSV_FILE, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(["Game Name", "URL", "Timestamp", "Status"])
+        
+        # Load Cache from CSV
+        with open(CSV_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            next(reader, None) # Skip Header
+            for row in reader:
+                if len(row) > 1:
+                    claimed_cache.add(row[1])
+        logger.info(f"📚 [Lite] Loaded {len(claimed_cache)} games from {CSV_FILE}")
+    except Exception as e:
+        logger.error(f"❌ Failed to init CSV: {e}")
 
 async def send_discord_notification(context, game_title, game_url, status="Claimed"):
     if not DISCORD_WEBHOOK_URL: return
@@ -97,14 +140,26 @@ async def send_discord_notification(context, game_title, game_url, status="Claim
         logger.error(f"⚠️ Failed to send Discord notification: {e}")
 
 def log_to_sheet_sync(game_name: str, url: str, status: str):
-    if gsheet_sheet:
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    claimed_cache.add(url)
+
+    if LITE_MODE:
+        # Write to CSV
         try:
-            gsheet_sheet.append_row([game_name, url, timestamp, status])
-            claimed_cache.add(url)
-            logger.info(f"📄 Logged to Google Sheet: {game_name} ({status})")
+            with open(CSV_FILE, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow([game_name, url, timestamp, status])
+            logger.info(f"📄 [Lite] Logged to CSV: {game_name} ({status})")
         except Exception as e:
-            logger.error(f"❌ Failed to log: {e}")
+            logger.error(f"❌ Failed to log to CSV: {e}")
+    else:
+        # Write to Google Sheet
+        if gsheet_sheet:
+            try:
+                gsheet_sheet.append_row([game_name, url, timestamp, status])
+                logger.info(f"📄 Logged to Google Sheet: {game_name} ({status})")
+            except Exception as e:
+                logger.error(f"❌ Failed to log: {e}")
 
 async def log_to_sheet(game_name: str, url: str, status: str = "Claimed"):
     await asyncio.to_thread(log_to_sheet_sync, game_name, url, status)
@@ -337,6 +392,9 @@ async def process_single_game(context, game_url: str, game_title: str, semaphore
             logger.info(f"💤 Tab closed: {game_title}")
 
 async def main_job():
+    # RELOAD CONFIG TO CATCH GUI CHANGES
+    reload_config()
+    
     logger.info(f"🚀 Job Started (Async Mode).")
     logger.info(f"📁 Browser Data Dir: {USER_DATA_DIR}")
     init_sheets()
