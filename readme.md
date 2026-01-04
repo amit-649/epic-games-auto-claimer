@@ -1,10 +1,10 @@
-![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square)
-![Automation](https://img.shields.io/badge/Automation-Playwright-green?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)
-![Beginner Friendly](https://img.shields.io/badge/Beginner-Friendly-brightgreen?style=flat-square)
-![Made With Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red?style=flat-square)
-
 # 🎮 Epic Games Auto-Claimer
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square)
+![Automation](https://img.shields.io/badge/Automation-Playwright-green?style=flat-square)
+![GUI](https://img.shields.io/badge/Interface-Modern%20Dark%20Mode-blueviolet?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)
+![Made With Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red?style=flat-square)
 
 **Never miss a free Epic Games title again — automatically, reliably, quietly. 🚀**
 
@@ -13,184 +13,110 @@ And every Thursday… most of us either forget, remember too late, or think *“
 
 This project exists to end that cycle. Permanently.
 
-**Epic Games Auto-Claimer** is a Python automation tool that runs in the background, checks the Epic Games Store for free titles, and claims them for you — without reminders, manual clicks, or constant attention.
+**Epic Games Auto-Claimer** is an automation tool that runs in the background, checks the store, and claims games for you.
 
-It also keeps a clean, permanent record of everything you’ve claimed using Google Sheets, so you always know what’s already yours.
-
-Built from a small personal frustration, but designed with care, reliability, and respect for real-world automation practices.
+Built from a small personal frustration, but designed with care. Now updated with a **Modern GUI** so you don't need to be a coder to use it!
 
 ---
 
 ## ✨ Key Features (What Makes This Worth Using)
 
+🖥️ **New: Modern Dark Mode GUI**
+No more scary command terminals. Configure everything in a clean, professional app window.
+
+📂 **New: Lite Mode (Zero Setup)**
+Don't want to mess with Google Cloud APIs? The bot now defaults to **Lite Mode**, logging all claimed games to a local `history.csv` file automatically.
+
 🧠 **Set & Forget Automation**
-Run it weekly (or schedule it using cron / Task Scheduler). Once configured, it takes care of everything on its own.
+Run it weekly. Once configured, it takes care of everything on its own.
 
-🔐 **Automatic Login with 2FA Support (God Mode)**
+🔐 **Automatic Login with 2FA (God Mode)**
 Session expired? No problem. The bot can securely log back in using your Epic credentials and TOTP-based 2FA.
-No repeated manual logins.
 
-🎯 **Smart Claim Logic**
-Already own a game? The bot detects it and skips unnecessary actions — no wasted requests.
+☁️ **Google Sheets Logging (Optional)**
+Prefer cloud logging? Drop in your `credentials.json`, and the bot automatically syncs with your Google Sheet.
 
 👻 **Headless Background Execution**
 Runs silently in headless mode. No browser windows, no interruptions, no distractions.
 
-🔔 **Discord Notifications (Optional)**
-Get a quick ping on Discord whenever a new game is successfully claimed.
+---
 
-📊 **Google Sheets Logging**
-Every claimed title is recorded in a Google Sheet for long-term tracking and peace of mind.
+## 📥 How to Download & Run (Easiest Method)
 
-📜 **Detailed Logs**
-All actions, successes, and errors are written to `bot.log` for transparency and easy debugging.
+Setup takes about **2 minutes**.
+
+### 1️⃣ Download
+Go to the **[Releases Page](../../releases)** and download the latest `.zip` file.
+
+### 2️⃣ Install
+Extract the ZIP file to a folder (e.g., `Desktop/EpicBot`).
+*⚠️ Important: Do not run it inside the zip file! Extract it first.*
+
+### 3️⃣ Launch
+Double-click **`EpicGamesBot.exe`**.
+
+### 4️⃣ Configure & Run
+1.  **Fill in your details:** (Epic Email, Password, and 2FA Secret).
+2.  Click **SAVE SETTINGS**.
+3.  Click **LAUNCH BOT**.
+
+That’s it. You're done.
 
 ---
 
-## 🚀 Getting Started
+## 🛡️ A Note on Antivirus (False Positives)
 
-Setup takes about **10 minutes**.
-Grab a coffee ☕ — it’s mostly copy-paste.
+Because this bot is built with Python and not digitally signed by a corporation (which costs $$$), **Windows Defender might flag it**.
 
----
+This is a generic "False Positive" (`Trojan:Win32/Wacatac` etc.) common with all PyInstaller apps.
 
-## 🔧 Prerequisites
-
-* Python **3.9+**
-* Google account (for Sheets logging)
-* Epic Games account
-* (Optional) Discord server for notifications
+**You have two choices:**
+1.  **Whitelist the folder** in Windows Defender and run the EXE.
+2.  **Or, run from source** (instructions below) if you prefer total transparency. The code is open source!
 
 ---
 
-## 🛠 Step 1: Installation
+## 🐍 How to Run from Source (For Developers)
 
-### 1️⃣ Download the repository
+If you prefer running the raw Python code yourself:
 
-* Click **Code → Download ZIP**
-* Extract it to a folder
+### Prerequisites
+*   Python 3.10+
+*   Google Chrome installed
 
-### 2️⃣ Install Python
-
-* Download from the official Python website
-* ⚠️ **Important:** Enable **“Add Python to PATH”** during installation
-
-### 3️⃣ Open a terminal in the project folder
-
-Right-click inside the folder → **Open in Terminal**
-
-### 4️⃣ Install dependencies
-
-```bash
-pip install -r requirements.txt
-playwright install chromium
-```
-
-That’s it for setup.
+### Steps
+1.  Clone this repository.
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    playwright install chromium
+    ```
+3.  Run the GUI:
+    ```bash
+    python gui.py
+    ```
 
 ---
 
-## 📊 Step 2: Google Sheets Setup (Bot Memory)
+## 📊 Google Sheets Setup (Optional)
 
-The bot uses Google Sheets to remember what it has already claimed.
+The bot uses `history.csv` by default. If you want Cloud Logging:
 
-1. Open **Google Cloud Console**
-2. Create a new project (any name works)
-3. Enable:
+1.  Enable **Sheets API** & **Drive API** in Google Cloud Console.
+2.  Download your Service Account Key.
+3.  Rename it to `credentials.json` and put it in the bot folder.
+4.  Create a Google Sheet named `EpicGamesLog` and share it with the Service Account email.
 
-   * Google Sheets API
-   * Google Drive API
-4. Go to **Credentials → Create Credentials → Service Account**
-5. Create a **JSON key**
-6. Rename it to `credentials.json`
-7. Place it in the project root folder
-8. Open the file and copy the **client_email**
-9. Create a Google Sheet (e.g. `EpicGamesLog`)
-10. Share the sheet with that email and grant **Editor access**
-
-Once this is done, the bot has a memory.
-
----
-
-## ⚙️ Step 3: Configuration
-
-Create a `.env` file in the project directory and add the following:
-
-```env
-# 🔔 DISCORD NOTIFICATIONS (Optional)
-DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/YOUR_WEBHOOK_HERE
-
-# 📊 GOOGLE SHEETS
-GOOGLE_SHEET_NAME=EpicGamesLog
-GOOGLE_CREDENTIALS_FILE=credentials.json
-
-# 🤖 BOT SETTINGS
-HEADLESS_MODE=true
-MAX_CONCURRENT_GAMES=4
-
-# 🔐 AUTO LOGIN (Optional but Recommended)
-EPIC_EMAIL=your_email@example.com
-EPIC_PASSWORD=your_password
-# Epic Account → Password & Security → 2FA → Authenticator App → Manual Entry
-EPIC_TOTP_SECRET=YOUR_2FA_SECRET_KEY
-```
-
-🔒 **Security note:**
-Never commit `.env` or `credentials.json` to a public repository.
-
----
-
-## 🔑 Step 4: Authentication
-
-You have two choices:
-
-### Option A: Manual Login (One-Time)
-
-```bash
-python auth.py
-```
-
-Log in once. Cookies are saved locally.
-
-### Option B: Fully Automated Login (Recommended)
-
-If `EPIC_TOTP_SECRET` is configured, the bot handles login automatically.
-No manual step needed.
-
----
-
-## ▶️ Step 5: Run the Bot
-
-```bash
-python bot.py
-```
-
-If everything is configured correctly, you’ll see success logs and claimed games being recorded.
-
-From this point on, the bot can be scheduled and forgotten.
-
----
-
-## 📁 Project Structure
-
-```
-bot.py                → Main automation logic
-auth.py               → Manual login helper
-.env                  → Environment configuration
-credentials.json      → Google API credentials
-bot.log               → Execution logs
-epic_browser_data/    → Stored browser session data
-```
+The bot will automatically detect the file and switch to Cloud Mode.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project is intended for **personal and educational automation use only**.
+This project is intended for **personal automation use only**.
 It mimics normal human interaction patterns and does not exploit Epic Games services.
 
-Use responsibly.
-You are accountable for how you run it.
+Use responsibly. You are accountable for how you run it.
 
 ---
 
@@ -204,4 +130,4 @@ Forget about it.
 
 And enjoy your steadily growing Epic Games library. 🎁🎮
 
-Happy gaming.
+**Made with 🩵 by Amit.**
