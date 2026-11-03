@@ -24,7 +24,7 @@ concurrency:
 jobs:
   claim-games:
     name: Claim Free Epic Games
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     steps:
@@ -81,3 +81,4 @@ jobs:
             *.png
           retention-days: 7
           if-no-files-found: ignore
+
