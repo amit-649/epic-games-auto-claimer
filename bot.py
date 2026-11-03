@@ -68,6 +68,36 @@ def reload_config():
 def init_sheets():
     global gsheet_client, gsheet_sheet, claimed_cache, LITE_MODE
     
+    # 0. Check for Cloud Secrets (e.g. GitHub Actions / CI)
+    if not os.path.exists(CREDENTIALS_FILE):
+        creds_base64 = os.getenv("GOOGLE_CREDENTIALS_BASE64")
+        creds_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+        if creds_base64:
+            try:
+                import base64
+                with open(CREDENTIALS_FILE, "wb") as f:
+                    f.write(base64.b64decode(creds_base64))
+                logger.info(f"🔑 Restored {CREDENTIALS_FILE} from GOOGLE_CREDENTIALS_BASE64 secret.")
+            except Exception as e:
+                logger.warning(f"Failed decoding GOOGLE_CREDENTIALS_BASE64: {e}")
+        elif creds_json:
+            try:
+                with open(CREDENTIALS_FILE, "w", encoding="utf-8") as f:
+                    f.write(creds_json)
+                logger.info(f"🔑 Restored {CREDENTIALS_FILE} from GOOGLE_CREDENTIALS_JSON secret.")
+            except Exception as e:
+                logger.warning(f"Failed writing GOOGLE_CREDENTIALS_JSON: {e}")
+
+    session_base64 = os.getenv("EPIC_SESSION_BASE64")
+    if session_base64 and not os.path.exists("epic_session.json"):
+        try:
+            import base64
+            with open("epic_session.json", "wb") as f:
+                f.write(base64.b64decode(session_base64))
+            logger.info("🔑 Restored epic_session.json from EPIC_SESSION_BASE64 secret.")
+        except Exception as e:
+            logger.warning(f"Failed decoding EPIC_SESSION_BASE64: {e}")
+
     # 1. Check if Credentials File Exists
     if not os.path.exists(CREDENTIALS_FILE):
         logger.warning("⚠️ Google Credentials not found. Switching to LITE MODE (CSV Storage).")
@@ -417,15 +447,34 @@ async def main_job():
             if HEADLESS_MODE:
                 launch_args.append("--headless=new")
             
+            # Browser Channel Resolution: in CI/GitHub Actions, default to Playwright Chromium (channel=None)
+            is_ci = os.getenv("CI", "false").lower() == "true" or os.getenv("GITHUB_ACTIONS", "false").lower() == "true"
+            default_channel = None if is_ci else "chrome"
+            chosen_channel = os.getenv("BROWSER_CHANNEL", default_channel)
+            if chosen_channel in ("", "None", "none", "chromium", "null"):
+                chosen_channel = None
+
             context = await p.chromium.launch_persistent_context(
                 user_data_dir=USER_DATA_DIR,
-                channel="chrome",
+                channel=chosen_channel,
                 headless=HEADLESS_MODE, 
                 args=launch_args,
                 # Use a real User-Agent to look less suspicious
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
                 viewport={"width": 1920, "height": 1080}
             )
+
+            # Inject session cookies if epic_session.json exists
+            if os.path.exists("epic_session.json"):
+                try:
+                    import json
+                    with open("epic_session.json", "r", encoding="utf-8") as f:
+                        saved_state = json.load(f)
+                        if "cookies" in saved_state and saved_state["cookies"]:
+                            await context.add_cookies(saved_state["cookies"])
+                            logger.info(f"🍪 Injected {len(saved_state['cookies'])} cookies from epic_session.json")
+                except Exception as e:
+                    logger.warning(f"Could not inject epic_session.json cookies: {e}")
             
             page = context.pages[0] if context.pages else await context.new_page()
 
@@ -508,6 +557,11 @@ async def main_job():
         except Exception as e:
             logger.critical(f"FATAL ERROR: {e}")
         finally:
+             try:
+                 await context.storage_state(path="epic_session.json")
+                 logger.info("💾 Persisted updated session state to epic_session.json")
+             except Exception:
+                 pass
              try: await context.close()
              except: pass
              

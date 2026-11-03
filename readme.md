@@ -1,133 +1,110 @@
 # 🎮 Epic Games Auto-Claimer
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square)
-![Automation](https://img.shields.io/badge/Automation-Playwright-green?style=flat-square)
-![GUI](https://img.shields.io/badge/Interface-Modern%20Dark%20Mode-blueviolet?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Active-success?style=flat-square)
-![Made With Love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red?style=flat-square)
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-blue?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Automation-Playwright-green?style=flat-square&logo=playwright&logoColor=white" alt="Playwright" />
+  <img src="https://img.shields.io/badge/Cloud-GitHub_Actions_Cron-2088FF?style=flat-square&logo=githubactions&logoColor=white" alt="GitHub Actions" />
+  <img src="https://img.shields.io/badge/Notifications-Discord_Webhook-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" />
+  <img src="https://img.shields.io/badge/Interface-Modern%20Dark%20GUI-blueviolet?style=flat-square" alt="GUI" />
+  <img src="https://img.shields.io/badge/Status-Active-success?style=flat-square" alt="Status" />
+</p>
 
 **Never miss a free Epic Games title again — automatically, reliably, quietly. 🚀**
 
-Every Thursday, Epic Games drops free games.
-And every Thursday… most of us either forget, remember too late, or think *“I’ll claim it later”* — and never do. 😅
+Every Thursday, Epic Games drops free games. And every Thursday… most of us either forget, remember too late, or think *"I'll claim it later"* — and never do. 😅
 
-This project exists to end that cycle. Permanently.
-
-**Epic Games Auto-Claimer** is an automation tool that runs in the background, checks the store, and claims games for you.
-
-Built from a small personal frustration, but designed with care. Now updated with a **Modern GUI** so you don't need to be a coder to use it!
+**Epic Games Auto-Claimer** ends that cycle permanently. It can run **locally via a sleek Dark GUI** or **100% in the Cloud via GitHub Actions** so you never even have to turn on your computer!
 
 ---
 
-## ✨ Key Features (What Makes This Worth Using)
+## ⚡ Features & Capabilities
 
-🖥️ **New: Modern Dark Mode GUI**
-No more scary command terminals. Configure everything in a clean, professional app window.
-
-📂 **New: Lite Mode (Zero Setup)**
-Don't want to mess with Google Cloud APIs? The bot now defaults to **Lite Mode**, logging all claimed games to a local `history.csv` file automatically.
-
-🧠 **Set & Forget Automation**
-Run it weekly. Once configured, it takes care of everything on its own.
-
-🔐 **Automatic Login with 2FA (God Mode)**
-Session expired? No problem. The bot can securely log back in using your Epic credentials and TOTP-based 2FA.
-
-☁️ **Google Sheets Logging (Optional)**
-Prefer cloud logging? Drop in your `credentials.json`, and the bot automatically syncs with your Google Sheet.
-
-👻 **Headless Background Execution**
-Runs silently in headless mode. No browser windows, no interruptions, no distractions.
+- ☁️ **100% Cloud Automated (GitHub Actions)**: Runs silently in the cloud every Thursday & Friday. Zero CPU, zero battery, zero local runtime.
+- 🖥️ **Modern Dark Mode Desktop GUI**: No terminal required if running locally. Configure everything in a clean, professional window.
+- 📂 **Lite Mode (Zero Setup)**: Automatically logs claimed games to a local `claimed_games_lite.csv` file without requiring external cloud accounts.
+- 🔐 **Automatic Login with TOTP 2FA (God Mode)**: When sessions expire, the bot regenerates real-time 2FA codes and authenticates automatically.
+- 🔔 **Discord Webhook Alerts**: Sends instant status briefings to your Discord channel whenever games are detected and claimed.
+- ☁️ **Google Sheets Sync (Optional)**: Automatically records claimed titles, redemption timestamps, and game URLs to your Google Sheet.
+- 👻 **Stealth Headless Execution**: Employs real user-agent fingerprints and anti-detection flags for reliable claims.
 
 ---
 
-## 📥 How to Download & Run (Easiest Method)
+## ☁️ 100% Cloud Automated Setup (GitHub Actions)
 
-Setup takes about **2 minutes**.
+Run the bot completely free in the cloud without keeping your PC awake:
 
-### 1️⃣ Download
-Go to the **[Releases Page](../../releases)** and download the latest `.zip` file.
+### 1️⃣ Add Repository Secrets
+In your GitHub repository, navigate to **Settings** > **Secrets and variables** > **Actions** and click **New repository secret**:
 
-### 2️⃣ Install
-Extract the ZIP file to a folder (e.g., `Desktop/EpicBot`).
-*⚠️ Important: Do not run it inside the zip file! Extract it first.*
+| Secret Name | Required? | Description |
+| :--- | :---: | :--- |
+| `EPIC_EMAIL` | **Yes** | Your Epic Games account email |
+| `EPIC_PASSWORD` | **Yes** | Your Epic Games account password |
+| `EPIC_TOTP_SECRET` | **Yes** | 2FA Secret Key (*Epic Account -> Password & Security -> Two-Factor Authentication -> Authenticator App -> "Manual Entry Key"*)|
+| `DISCORD_WEBHOOK_URL` | Optional | Discord Webhook URL for claim alerts |
+| `GOOGLE_CREDENTIALS_BASE64` | Optional | Base64-encoded `credentials.json` if syncing to Google Sheets |
+| `GOOGLE_SHEET_NAME` | Optional | Defaults to `EpicGamesLog` |
 
-### 3️⃣ Launch
-Double-click **`EpicGamesBot.exe`**.
+> [!TIP]
+> To generate `GOOGLE_CREDENTIALS_BASE64` from your local service account key:
+> ```bash
+> # In PowerShell:
+> [Convert]::ToBase64String([IO.File]::ReadAllBytes("credentials.json")) | Set-Clipboard
+> ```
 
-### 4️⃣ Configure & Run
-1.  **Fill in your details:** (Epic Email, Password, and 2FA Secret).
-2.  Click **SAVE SETTINGS**.
-3.  Click **LAUNCH BOT**.
+### 2️⃣ Automated Schedule
+The included workflow (`.github/workflows/claim_games.yml`) triggers automatically:
+- **Every Thursday at 10:00 PM IST (16:30 UTC)**: 30 minutes after Epic Games drops weekly free titles.
+- **Every Friday at 10:00 PM IST (16:30 UTC)**: Backup run to guarantee no title is missed.
 
-That’s it. You're done.
-
----
-
-## 🛡️ A Note on Antivirus (False Positives)
-
-Because this bot is built with Python and not digitally signed by a corporation (which costs $$$), **Windows Defender might flag it**.
-
-This is a generic "False Positive" (`Trojan:Win32/Wacatac` etc.) common with all PyInstaller apps.
-
-**You have two choices:**
-1.  **Whitelist the folder** in Windows Defender and run the EXE.
-2.  **Or, run from source** (instructions below) if you prefer total transparency. The code is open source!
+### 3️⃣ Manual Execution Anytime
+Go to the **Actions** tab in your GitHub repository, select **Epic Games Weekly Auto-Claimer**, and click **Run workflow**.
 
 ---
 
-## 🐍 How to Run from Source (For Developers)
+## 🖥️ Local Desktop Setup (GUI & Exe)
 
-If you prefer running the raw Python code yourself:
+### 1️⃣ Download Pre-Built Release
+1. Go to the **[Releases Page](../../releases)** and download the latest `.zip`.
+2. Extract the ZIP to a folder (e.g., `Desktop/EpicBot`).
+3. Double-click **`EpicGamesBot.exe`**.
+4. Fill in your details (Email, Password, 2FA Secret) and click **LAUNCH BOT**.
 
-### Prerequisites
-*   Python 3.10+
-*   Google Chrome installed
+---
 
-### Steps
-1.  Clone this repository.
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    playwright install chromium
-    ```
-3.  Run the GUI:
-    ```bash
-    python gui.py
-    ```
+## 🐍 How to Run from Source (Local Python)
+
+```bash
+# Clone the repository
+git clone https://github.com/amit-649/epic-games-auto-claimer.git
+cd epic-games-auto-claimer
+
+# Install dependencies
+pip install -r requirements.txt
+playwright install chromium
+
+# Launch Modern GUI
+python gui.py
+
+# Or run headless bot directly
+python bot.py
+```
 
 ---
 
 ## 📊 Google Sheets Setup (Optional)
 
-The bot uses `history.csv` by default. If you want Cloud Logging:
-
-1.  Enable **Sheets API** & **Drive API** in Google Cloud Console.
-2.  Download your Service Account Key.
-3.  Rename it to `credentials.json` and put it in the bot folder.
-4.  Create a Google Sheet named `EpicGamesLog` and share it with the Service Account email.
-
-The bot will automatically detect the file and switch to Cloud Mode.
+1. Enable **Google Sheets API** & **Google Drive API** in Google Cloud Console.
+2. Download your Service Account JSON key as `credentials.json` into the root directory.
+3. Create a Google Sheet named `EpicGamesLog` and share it with the service account email.
+4. The bot will automatically detect `credentials.json` and switch from CSV to Cloud Mode.
 
 ---
 
 ## ⚠️ Disclaimer
 
-This project is intended for **personal automation use only**.
-It mimics normal human interaction patterns and does not exploit Epic Games services.
-
-Use responsibly. You are accountable for how you run it.
+This tool is intended for personal automation and game claiming convenience. It respects platform endpoints and does not exploit services.
 
 ---
 
-## 🎮 Final Note
-
-This tool exists so you don’t have to think about free games ever again.
-
-Run it.
-Schedule it.
-Forget about it.
-
-And enjoy your steadily growing Epic Games library. 🎁🎮
-
-**Made with 🩵 by Amit.**
+**Made with 🩵 by [Amit Kumar Garai](https://amitcodes.in/).**
